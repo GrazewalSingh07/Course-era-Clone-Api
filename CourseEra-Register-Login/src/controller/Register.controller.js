@@ -9,7 +9,7 @@ const newToken=(user)=>{
     return jwt.sign({user},process.env.SECRET_KEY)
 }
 router.post("/",body("username")
-.not().isEmpty().bail().isString().bail().withMessage("Please enter username").bail().isLength({min:8,max:25}).withMessage("Please enter a valid username"),
+.not().isEmpty().bail().isString().bail().withMessage("Please enter username").bail(),
 body("email").not().isEmpty().bail().isEmail().withMessage("Please enter a valid email address").bail().custom(async(value)=>{
     let user=await User.find({email:value}).lean().exec()
     if(user===[]){
@@ -27,13 +27,26 @@ body("email").not().isEmpty().bail().isEmail().withMessage("Please enter a valid
          return true;
 }).bail(),async(req,res)=>{
     try {
+
+        // const errors = validationResult(req);
+        // if (errors.isEmpty()) {
+            
+        // }
+        // const extractedErrors = []
+        // errors.array({ onlyFirstError: true }).map(err => extractedErrors.push({ [err.param]: err.msg }));
+      
+        // return res.status(422).json({
+        //   errors: extractedErrors,
+        // });
         const errors=validationResult(req)
         if(!errors.isEmpty()){
+            
             return res.status(400).json({error:errors.array()})
-     }
-        const user= await User.create(req.body)
-        const token=newToken(user)
-       return  res.status(200).send({token:token})
+     
+    }
+    const user= await User.create(req.body)
+            const token=newToken(user)
+           return  res.status(200).send({token:token})
     } catch (error) {
         if(error.code===11000){
            return res.status(500).send("Register successful please login ")
