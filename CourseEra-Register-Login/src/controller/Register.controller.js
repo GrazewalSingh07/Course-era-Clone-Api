@@ -9,7 +9,7 @@ const newToken=(user)=>{
     return jwt.sign({user},process.env.SECRET_KEY)
 }
 router.post("/",body("username")
-.not().isEmpty().bail().isString().bail().withMessage("Please enter username").bail(),
+.not().isEmpty().bail().isString().bail().withMessage("Please enter username").bail().isLength({min:8,max:25}).withMessage("Please enter a valid username"),
 body("email").not().isEmpty().bail().isEmail().withMessage("Please enter a valid email address").bail().custom(async(value)=>{
     let user=await User.find({email:value}).lean().exec()
     if(user===[]){
